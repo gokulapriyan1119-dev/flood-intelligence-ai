@@ -118,8 +118,8 @@ device = torch.device(
 # LOAD TRAINED MODEL
 # ==============================
 
-MODEL_PATH = (
-    "/content/flood_project/"
+MODEL_PATH = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)),
     "unet_flood_segmentation.pth"
 )
 
