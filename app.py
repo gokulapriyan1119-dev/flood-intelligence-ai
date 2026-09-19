@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 import json
 import os
 import sys
+from report_generator import create_flood_report
 
 # ============================================================
 # PAGE CONFIG
@@ -1495,6 +1496,32 @@ for col, (icon, title, sub) in zip(pipe_cols, steps):
 
 # Downloads
 st.markdown('<div class="fi-section">EXPORT ANALYSIS</div>', unsafe_allow_html=True)
+
+# PDF REPORT
+st.markdown('<div class="fi-section">FLOOD ANALYSIS REPORT</div>', unsafe_allow_html=True)
+
+try:
+    pdf_bytes = create_flood_report(
+        sar_path=SAR_PATH,
+        probability_path=PROB_PATH,
+        depth_path=DEPTH_PATH,
+        risk_path=RISK_PATH,
+        rainfall_path=RAINFALL_PATH,
+        rainfall_mm=float(total_rainfall),
+    )
+
+    st.download_button(
+        "📄 Download Flood Analysis Report",
+        data=pdf_bytes,
+        file_name="Flood_Intelligence_Analysis_Report.pdf",
+        mime="application/pdf",
+        use_container_width=True,
+    )
+
+except Exception as e:
+    st.error(f"Unable to generate PDF report: {e}")
+
+
 d1, d2, d3 = st.columns(3)
 
 with open(DEPTH_PATH, "rb") as f:
