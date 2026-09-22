@@ -1138,6 +1138,55 @@ if analysis_mode == "Upload Analysis":
                     mime="image/tiff"
                 )
 
+                # --------------------------------------------------------
+                # PDF FLOOD ANALYSIS REPORT
+                # --------------------------------------------------------
+                st.subheader("📄 Flood Analysis Report")
+
+                try:
+                    report_depth_path = os.path.join(
+                        upload_dir, "flood_depth_report.tif"
+                    )
+
+                    report_risk_path = os.path.join(
+                        upload_dir, "flood_risk_report.tif"
+                    )
+
+                    report_probability_path = os.path.join(
+                        upload_dir, "flood_probability_report.tif"
+                    )
+
+                    with open(report_depth_path, "wb") as f:
+                        f.write(depth_bytes)
+
+                    with open(report_risk_path, "wb") as f:
+                        f.write(risk_bytes)
+
+                    with open(report_probability_path, "wb") as f:
+                        f.write(probability_bytes)
+
+                    pdf_report = create_flood_report(
+                        sar_path=upload_path,
+                        probability_path=report_probability_path,
+                        depth_path=report_depth_path,
+                        risk_path=report_risk_path,
+                        rainfall_path=RAINFALL_PATH,
+                        rainfall_mm=float(total_rainfall),
+                    )
+
+                    st.download_button(
+                        "📄 Download Flood Analysis Report",
+                        data=pdf_report,
+                        file_name="Flood_Intelligence_Analysis_Report.pdf",
+                        mime="application/pdf",
+                        use_container_width=True,
+                    )
+
+                except Exception as report_error:
+                    st.error(
+                        f"❌ Unable to generate PDF report: {report_error}"
+                    )
+
                 st.warning(
                     "⚠️ Depth and risk are model-estimated research outputs. "
                     "They are not validated against measured flood-depth ground truth "
@@ -1496,31 +1545,6 @@ for col, (icon, title, sub) in zip(pipe_cols, steps):
 
 # Downloads
 st.markdown('<div class="fi-section">EXPORT ANALYSIS</div>', unsafe_allow_html=True)
-
-# PDF REPORT
-st.markdown('<div class="fi-section">FLOOD ANALYSIS REPORT</div>', unsafe_allow_html=True)
-
-try:
-    pdf_bytes = create_flood_report(
-        sar_path=SAR_PATH,
-        probability_path=PROB_PATH,
-        depth_path=DEPTH_PATH,
-        risk_path=RISK_PATH,
-        rainfall_path=RAINFALL_PATH,
-        rainfall_mm=float(total_rainfall),
-    )
-
-    st.download_button(
-        "📄 Download Flood Analysis Report",
-        data=pdf_bytes,
-        file_name="Flood_Intelligence_Analysis_Report.pdf",
-        mime="application/pdf",
-        use_container_width=True,
-    )
-
-except Exception as e:
-    st.error(f"Unable to generate PDF report: {e}")
-
 
 d1, d2, d3 = st.columns(3)
 
